@@ -11,12 +11,24 @@ export default class D3Chart {
       .attr("width", 500)
       .attr("height", 500);
 
-    svg
+    const rects = svg.selectAll("rect").data(data);
+
+    rects
+      .enter()
       .append("rect")
-      .attr("x", 50)
+      .attr("x", (d, i) => i * 100)
       .attr("y", 50)
-      .attr("width", 100)
-      .attr("height", 400)
+      .attr("width", 50)
+      .attr("height", (d) => d)
       .attr("fill", "gray");
+
+    //ONLY one rect
+    // svg
+    //   .append("rect")
+    //   .attr("x", 50)
+    //   .attr("y", 50)
+    //   .attr("width", 100)
+    //   .attr("height", 400)
+    //   .attr("fill", "gray");
   }
 }
