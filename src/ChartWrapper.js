@@ -18,7 +18,7 @@ export default class ChartWrapper extends Component {
 //     if (!chart) {
 //       setChart(new D3Chart(chartArea.current));
 //     } else {
-//       //  chart.update();
+//        chart.update();
 //     }
 //   }, [chart]);
 
