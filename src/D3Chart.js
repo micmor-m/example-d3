@@ -15,8 +15,9 @@ const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTON;
 
 export default class D3Chart {
   constructor(element) {
-    console.log("Hello word");
-    const svg = d3
+    const vis = this; //to make sure to call always the instance of D3Chart
+    //console.log("Hello word");
+    vis.svg = d3
       .select(element)
       .append("svg")
       .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
@@ -24,86 +25,88 @@ export default class D3Chart {
       .append("g")
       .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP} )`);
 
+    //label x axis
+    vis.svg
+      .append("text")
+      .attr("x", WIDTH / 2)
+      .attr("y", HEIGHT + 50)
+      .attr("text-anchor", "middle")
+      .text("The word's tallest men");
+
+    //label y axis
+    vis.svg
+      .append("text")
+      .attr("x", -HEIGHT / 2)
+      .attr("y", -50)
+      .attr("text-anchor", "middle")
+      .text("Height in cm")
+      .attr("transform", "rotate(-90)");
+
+    vis.xAxisGroup = vis.svg
+      .append("g")
+      .attr("transform", `translate(0, ${HEIGHT})`);
+
+    vis.yAxisGroup = vis.svg.append("g");
+
     d3.json(url).then((data) => {
       // console.log(agesData);
+      //repeat action every second
+      vis.data = data;
+      d3.interval(() => {
+        //console.log("Hello world");
+        vis.update();
+      }, 1000);
+    });
+  }
 
-      //get max value from array
-      const max = d3.max(data, (d) => {
-        return d.height;
-      });
-
-      //const y = d3.scaleLinear().domain([0, max]).range([HEIGHT, 0]);
-      //const y = d3.scaleLinear().domain([250, max]).range([HEIGHT, 0]); //y start from 250
-      const y = d3
-        .scaleLinear()
-        .domain([
-          d3.min(data, (d) => d.height) * 0.95,
-          d3.max(data, (d) => d.height),
-        ])
-        .range([HEIGHT, 0]);
-
-      const x = d3
-        .scaleBand()
-        .domain(data.map((d) => d.name))
-        .range([0, WIDTH])
-        .padding(0.4);
-
-      //generate x axis
-      const xAxisCall = d3.axisBottom(x);
-      svg
-        .append("g")
-        .attr("transform", `translate(0, ${HEIGHT})`)
-        .call(xAxisCall);
-
-      //generate y axis
-      const yAxisCall = d3.axisLeft(y);
-      svg.append("g").call(yAxisCall);
-
-      //label x axis
-      svg
-        .append("text")
-        .attr("x", WIDTH / 2)
-        .attr("y", HEIGHT + 50)
-        .attr("text-anchor", "middle")
-        .text("The word's tallest men");
-
-      //label y axis
-      svg
-        .append("text")
-        .attr("x", -HEIGHT / 2)
-        .attr("y", -50)
-        .attr("text-anchor", "middle")
-        .text("Height in cm")
-        .attr("transform", "rotate(-90)");
-
-      const rects = svg.selectAll("rect").data(data);
-      rects
-        .enter()
-        .append("rect")
-        .attr("x", (d) => x(d.name))
-        .attr("y", (d) => y(d.height)) //to make the bars start form botton
-        .attr("width", x.bandwidth)
-        //.attr("height", (d) => d.height)
-        .attr("height", (d) => HEIGHT - y(d.height))
-        .attr("fill", "gray");
+  update() {
+    const vis = this;
+    //get max value from array
+    const max = d3.max(vis.data, (d) => {
+      return d.height;
     });
 
-    // d3.json(url).then((data) => {
-    //   // console.log(agesData);
-    //   const rects = svg.selectAll("rect").data(data);
-    //   rects
-    //     .enter()
-    //     .append("rect")
-    //     .attr("x", (d, i) => i * 100)
-    //     .attr("y", 50)
-    //     .attr("width", 50)
-    //     .attr("height", (d) => d.age * 10)
-    //     .attr("fill", (d) => {
-    //       if (d.age > 10) {
-    //         return "red";
-    //       }
-    //       return "green";
-    //     });
-    // });
+    //const y = d3.scaleLinear().domain([0, max]).range([HEIGHT, 0]);
+    //const y = d3.scaleLinear().domain([250, max]).range([HEIGHT, 0]); //y start from 250
+    const y = d3
+      .scaleLinear()
+      .domain([
+        d3.min(vis.data, (d) => d.height) * 0.95,
+        d3.max(vis.data, (d) => d.height),
+      ])
+      .range([HEIGHT, 0]);
+
+    const x = d3
+      .scaleBand()
+      .domain(vis.data.map((d) => d.name))
+      .range([0, WIDTH])
+      .padding(0.4);
+
+    //generate x axis
+    const xAxisCall = d3.axisBottom(x);
+    vis.xAxisGroup.call(xAxisCall);
+
+    //generate y axis
+    const yAxisCall = d3.axisLeft(y);
+    vis.yAxisGroup.call(yAxisCall);
+
+    // DATA JOIN
+    const rects = vis.svg.selectAll("rect").data(vis.data);
+    console.log(rects);
+
+    // EXIT
+
+    // UPDATE
+
+    // ENTER
+    rects
+      .enter()
+      .append("rect")
+      .attr("x", (d) => x(d.name))
+      .attr("y", (d) => y(d.height)) //to make the bars start form botton
+      .attr("width", x.bandwidth)
+      //.attr("height", (d) => d.height)
+      .attr("height", (d) => HEIGHT - y(d.height))
+      .attr("fill", "gray");
   }
 }
