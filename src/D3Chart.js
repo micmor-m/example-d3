@@ -5,7 +5,7 @@ import * as d3 from "d3";
 //const url = "https://udemy-react-d3.firebaseio.com/ages.json";
 const url = "https://udemy-react-d3.firebaseio.com/tallest_men.json";
 //const url = "../server/dataFiles/data.json";
-const MARGIN = { TOP: 10, BOTTON: 50, LEFT: 50, RIGHT: 10 };
+const MARGIN = { TOP: 10, BOTTON: 50, LEFT: 70, RIGHT: 10 };
 const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
 const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTON;
 
@@ -58,6 +58,23 @@ export default class D3Chart {
       //generate y axis
       const yAxisCall = d3.axisLeft(y);
       svg.append("g").call(yAxisCall);
+
+      //label x axis
+      svg
+        .append("text")
+        .attr("x", WIDTH / 2)
+        .attr("y", HEIGHT + 50)
+        .attr("text-anchor", "middle")
+        .text("The word's tallest men");
+
+      //label y axis
+      svg
+        .append("text")
+        .attr("x", -HEIGHT / 2)
+        .attr("y", -50)
+        .attr("text-anchor", "middle")
+        .text("Height in cm")
+        .attr("transform", "rotate(-90)");
 
       const rects = svg.selectAll("rect").data(data);
       rects
