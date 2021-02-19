@@ -10,7 +10,7 @@ class App extends Component {
     return (
       <div className="App">
         <Navbar bg="light">
-          <Navbar.Brand href="#home">Brand link</Navbar.Brand>
+          <Navbar.Brand href="#home">Barchart</Navbar.Brand>
         </Navbar>
         <Container>
           <ChartWrapper />
