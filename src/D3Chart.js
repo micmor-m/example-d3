@@ -48,15 +48,22 @@ export default class D3Chart {
 
     vis.yAxisGroup = vis.svg.append("g");
 
-    d3.json(url).then((data) => {
-      // console.log(agesData);
-      //repeat action every second
-      vis.data = data;
-      d3.interval(() => {
-        //console.log("Hello world");
-        vis.update();
-      }, 1000);
+    Promise.all([
+      d3.json("https://udemy-react-d3.firebaseio.com/tallest_men.json"),
+      d3.json("https://udemy-react-d3.firebaseio.com/tallest_women.json"),
+    ]).then((datasets) => {
+      console.log(datasets);
     });
+
+    // d3.json(url).then((data) => {
+    //   // console.log(agesData);
+    //   //repeat action every second
+    //   vis.data = data;
+    //   d3.interval(() => {
+    //     //console.log("Hello world");
+    //     vis.update();
+    //   }, 1000);
+    // });
   }
 
   update() {
@@ -95,8 +102,15 @@ export default class D3Chart {
     console.log(rects);
 
     // EXIT
+    rects.exit().remove();
 
     // UPDATE
+    rects
+      .attr("x", (d) => x(d.name))
+      .attr("y", (d) => y(d.height)) //to make the bars start form botton
+      .attr("width", x.bandwidth)
+      //.attr("height", (d) => d.height)
+      .attr("height", (d) => HEIGHT - y(d.height));
 
     // ENTER
     rects
