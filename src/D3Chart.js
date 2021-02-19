@@ -5,9 +5,9 @@ import * as d3 from "d3";
 //const url = "https://udemy-react-d3.firebaseio.com/ages.json";
 const url = "https://udemy-react-d3.firebaseio.com/tallest_men.json";
 //const url = "../server/dataFiles/data.json";
-
-const WIDTH = 800;
-const HEIGHT = 500;
+const MARGIN = { TOP: 10, BOTTON: 50, LEFT: 50, RIGHT: 10 };
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
+const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTON;
 
 // d3.json("../server/dataFiles/data.json", function (data) {
 //   console.log(data);
@@ -19,8 +19,10 @@ export default class D3Chart {
     const svg = d3
       .select(element)
       .append("svg")
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT);
+      .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+      .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTON)
+      .append("g")
+      .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP} )`);
 
     d3.json(url).then((data) => {
       // console.log(agesData);
@@ -30,7 +32,15 @@ export default class D3Chart {
         return d.height;
       });
 
-      const y = d3.scaleLinear().domain([0, max]).range([0, HEIGHT]);
+      //const y = d3.scaleLinear().domain([0, max]).range([HEIGHT, 0]);
+      //const y = d3.scaleLinear().domain([250, max]).range([HEIGHT, 0]); //y start from 250
+      const y = d3
+        .scaleLinear()
+        .domain([
+          d3.min(data, (d) => d.height) * 0.95,
+          d3.max(data, (d) => d.height),
+        ])
+        .range([HEIGHT, 0]);
 
       const x = d3
         .scaleBand()
@@ -40,21 +50,24 @@ export default class D3Chart {
 
       //generate x axis
       const xAxisCall = d3.axisBottom(x);
-      svg.call(xAxisCall);
+      svg
+        .append("g")
+        .attr("transform", `translate(0, ${HEIGHT})`)
+        .call(xAxisCall);
 
       //generate y axis
       const yAxisCall = d3.axisLeft(y);
-      svg.call(yAxisCall);
+      svg.append("g").call(yAxisCall);
 
       const rects = svg.selectAll("rect").data(data);
       rects
         .enter()
         .append("rect")
         .attr("x", (d) => x(d.name))
-        .attr("y", (d) => HEIGHT - y(d.height)) //to make the bars start form botton
+        .attr("y", (d) => y(d.height)) //to make the bars start form botton
         .attr("width", x.bandwidth)
         //.attr("height", (d) => d.height)
-        .attr("height", (d) => y(d.height))
+        .attr("height", (d) => HEIGHT - y(d.height))
         .attr("fill", "gray");
     });
 
