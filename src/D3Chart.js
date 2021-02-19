@@ -25,6 +25,7 @@ export default class D3Chart {
     d3.json(url).then((data) => {
       // console.log(agesData);
 
+      //get max value from array
       const max = d3.max(data, (d) => {
         return d.height;
       });
@@ -36,6 +37,14 @@ export default class D3Chart {
         .domain(data.map((d) => d.name))
         .range([0, WIDTH])
         .padding(0.4);
+
+      //generate x axis
+      const xAxisCall = d3.axisBottom(x);
+      svg.call(xAxisCall);
+
+      //generate y axis
+      const yAxisCall = d3.axisLeft(y);
+      svg.call(yAxisCall);
 
       const rects = svg.selectAll("rect").data(data);
       rects
