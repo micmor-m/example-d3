@@ -52,7 +52,19 @@ export default class D3Chart {
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_men.json"),
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_women.json"),
     ]).then((datasets) => {
-      console.log(datasets);
+      const [men, women] = datasets;
+
+      //this is to avoid an blank chart the first second
+      vis.data = men;
+      vis.update();
+
+      // flag support toggle between men and women
+      let flag = true;
+      d3.interval(() => {
+        vis.data = flag ? men : women;
+        vis.update();
+        flag = !flag;
+      }, 1000);
     });
 
     // d3.json(url).then((data) => {
@@ -91,21 +103,29 @@ export default class D3Chart {
 
     //generate x axis
     const xAxisCall = d3.axisBottom(x);
-    vis.xAxisGroup.call(xAxisCall);
+    vis.xAxisGroup.transition().duration(500).call(xAxisCall);
 
     //generate y axis
     const yAxisCall = d3.axisLeft(y);
-    vis.yAxisGroup.call(yAxisCall);
+    vis.yAxisGroup.transition().duration(500).call(yAxisCall);
 
     // DATA JOIN
     const rects = vis.svg.selectAll("rect").data(vis.data);
     console.log(rects);
 
     // EXIT
-    rects.exit().remove();
+    rects
+      .exit()
+      .transition()
+      .duration(500)
+      .attr("height", 0)
+      .attr("y", HEIGHT)
+      .remove();
 
     // UPDATE
     rects
+      .transition()
+      .duration(500)
       .attr("x", (d) => x(d.name))
       .attr("y", (d) => y(d.height)) //to make the bars start form botton
       .attr("width", x.bandwidth)
@@ -117,10 +137,13 @@ export default class D3Chart {
       .enter()
       .append("rect")
       .attr("x", (d) => x(d.name))
-      .attr("y", (d) => y(d.height)) //to make the bars start form botton
       .attr("width", x.bandwidth)
       //.attr("height", (d) => d.height)
-      .attr("height", (d) => HEIGHT - y(d.height))
-      .attr("fill", "gray");
+      .attr("fill", "gray")
+      .attr("y", HEIGHT)
+      .transition()
+      .duration(500)
+      .attr("y", (d) => y(d.height)) //to make the bars start form botton
+      .attr("height", (d) => HEIGHT - y(d.height));
   }
 }
