@@ -26,12 +26,12 @@ export default class D3Chart {
       .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP} )`);
 
     //label x axis
-    vis.svg
+    vis.xLabel = vis.svg
       .append("text")
       .attr("x", WIDTH / 2)
       .attr("y", HEIGHT + 50)
-      .attr("text-anchor", "middle")
-      .text("The word's tallest men");
+      .attr("text-anchor", "middle");
+    //.text("The word's tallest men");
 
     //label y axis
     vis.svg
@@ -52,34 +52,41 @@ export default class D3Chart {
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_men.json"),
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_women.json"),
     ]).then((datasets) => {
-      const [men, women] = datasets;
+      //const [men, women] = datasets;
+      vis.menData = datasets[0];
+      vis.womenData = datasets[1];
+      vis.update("men");
 
       //this is to avoid an blank chart the first second
-      vis.data = men;
-      vis.update();
+      // vis.data = men;
+      // vis.update();
 
       // flag support toggle between men and women
-      let flag = true;
-      d3.interval(() => {
-        vis.data = flag ? men : women;
-        vis.update();
-        flag = !flag;
-      }, 1000);
-    });
+      //   let flag = true;
+      //   d3.interval(() => {
+      //     vis.data = flag ? men : women;
+      //     vis.update();
+      //const gender = flag ? "men" : "women"
+      //vis.xLabel.text(`The world's tallest ${gender}`);
+      //     flag = !flag;
+      //   }, 1000);
+      // });
 
-    // d3.json(url).then((data) => {
-    //   // console.log(agesData);
-    //   //repeat action every second
-    //   vis.data = data;
-    //   d3.interval(() => {
-    //     //console.log("Hello world");
-    //     vis.update();
-    //   }, 1000);
-    // });
+      // d3.json(url).then((data) => {
+      //   // console.log(agesData);
+      //   //repeat action every second
+      //   vis.data = data;
+      //   d3.interval(() => {
+      //     //console.log("Hello world");
+      //     vis.update();
+      //   }, 1000);
+    });
   }
 
-  update() {
+  update(gender) {
     const vis = this;
+    vis.data = gender === "men" ? vis.menData : vis.womenData;
+    vis.xLabel.text(`The world's tallest ${gender}`);
     //get max value from array
     const max = d3.max(vis.data, (d) => {
       return d.height;

@@ -1,13 +1,19 @@
 import React, { Component } from "react";
-//import Jumbotron from "react-bootstrap/Jumbotron";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import ChartWrapper from "./ChartWrapper";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import GenderDropdown from "./GenderDropdown";
 
 class App extends Component {
+  state = {
+    gender: "men",
+  };
+
+  genderSelected = (gender) => this.setState({ gender });
+
   render() {
     return (
       <div className="App">
@@ -16,12 +22,15 @@ class App extends Component {
         </Navbar>
         <Container>
           <Row>
-            <Col></Col>
+            <Col xs={12}>
+              <GenderDropdown genderSelected={this.genderSelected} />
+            </Col>
           </Row>
           <Row>
-            <Col></Col>
+            <Col xs={12}>
+              <ChartWrapper gender={this.state.gender} />
+            </Col>
           </Row>
-          <ChartWrapper />
         </Container>
       </div>
     );
